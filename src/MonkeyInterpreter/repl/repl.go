@@ -7,6 +7,8 @@ import (
     "io"
     "MonkeyInterpreter/lexer"
     "MonkeyInterpreter/parser"
+    "MonkeyInterpreter/evaluator"
+    "MonkeyInterpreter/object"
 )
 
 const PROMPT = ">> "
@@ -17,6 +19,7 @@ func Start(in io.Reader, out io.Writer){
     for { 
         fmt.Printf(PROMPT) 
         scanned := scanner.Scan()
+        env := object.NewEnvironment()
 
         if !scanned { 
             return
@@ -32,9 +35,13 @@ func Start(in io.Reader, out io.Writer){
             printParserErrors(out, p.Errors()) 
             continue
         }
+        
+        evaluated := evaluator.Eval(program, env)
 
-        io.WriteString(out, program.String())
-        io.WriteString(out, "\n")
+        if evaluated != nil {
+            io.WriteString(out, evaluated.Inspect())
+            io.WriteString(out, "\n")
+        }
 
     }
 }
