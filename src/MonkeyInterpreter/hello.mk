@@ -1,8 +1,5 @@
 
-let hello = "hello";
-let world = "world";
-
-hello + " " + world;
+puts("Hello World");
 
 let map = fn(arr, f) {
 	let iter = fn(arr, accumulated){
@@ -18,7 +15,7 @@ let map = fn(arr, f) {
 
 let a = [1, 2, 3, 4];
 let double = fn(x) { x * 2 };
-map(a, double);
+puts(map(a, double));
 
 let reduce = fn(arr, initial, f){	
 	let iter = fn(arr, result) {
@@ -37,4 +34,4 @@ let sum = fn(arr) {
 };
 
 let somme = sum(a);
-somme;
+puts(somme);
