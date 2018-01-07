@@ -23,7 +23,7 @@ func Start(in io.Reader, out io.Writer) {
 		if !scanned {
 			return
 		}
-
+        
 		line := scanner.Text()
 		l := lexer.New(line)
 		p := parser.New(l)
@@ -43,6 +43,8 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 	}
+    
+    fmt.Println("Au revoir")
 }
 
 func printParserErrors(out io.Writer, errors []string) {
