@@ -1,58 +1,58 @@
 package main
 
 import (
+	"MonkeyInterpreter/evaluator"
+	"MonkeyInterpreter/lexer"
+	"MonkeyInterpreter/object"
+	"MonkeyInterpreter/parser"
 	"MonkeyInterpreter/repl"
-    "MonkeyInterpreter/lexer"
-    "MonkeyInterpreter/parser"
-    "MonkeyInterpreter/object"
-    "MonkeyInterpreter/evaluator"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/user"
-    "io/ioutil"
 )
 
 func main() {
 
-    if len(os.Args) < 2 {
- 
-    	user, err := user.Current()
-    	if err != nil {
-    		panic(err)
-    	}
+	if len(os.Args) < 2 {
 
-    	fmt.Printf("Hello %s! Welcome to interactive mode!\n",
-    		user.Username)
+		user, err := user.Current()
+		if err != nil {
+			panic(err)
+		}
 
-    	fmt.Printf("Enter commands\n")
+		fmt.Printf("Hello %s! Welcome to interactive mode!\n",
+			user.Username)
 
-    	repl.Start(os.Stdin, os.Stdout)
-   
-    }else {
-        dat, err := ioutil.ReadFile(os.Args[1]) 
+		fmt.Printf("Enter commands\n")
 
-        if err != nil {
-            panic(err) 
-        }
-        
-        env := object.NewEnvironment()
-        l := lexer.New(string(dat))
-        p := parser.New(l)
-        program := p.ParseProgram()
+		repl.Start(os.Stdin, os.Stdout)
 
-        if len(p.Errors()) != 0 {
-            for _, msg := range p.Errors() {
-                fmt.Println("\t" + msg + "\n") 
-            } 
+	} else {
+		dat, err := ioutil.ReadFile(os.Args[1])
 
-            os.Exit(1)
-        }
+		if err != nil {
+			panic(err)
+		}
 
-        evaluated := evaluator.Eval(program, env)
+		env := object.NewEnvironment()
+		l := lexer.New(string(dat))
+		p := parser.New(l)
+		program := p.ParseProgram()
 
-        if evaluated != nil {
-            fmt.Println(evaluated.Inspect()) 
-        }
+		if len(p.Errors()) != 0 {
+			for _, msg := range p.Errors() {
+				fmt.Println("\t" + msg + "\n")
+			}
 
-    }
+			os.Exit(1)
+		}
+
+		evaluated := evaluator.Eval(program, env)
+
+		if evaluated != nil {
+			fmt.Println(evaluated.Inspect())
+		}
+
+	}
 }
