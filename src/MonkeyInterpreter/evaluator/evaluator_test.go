@@ -203,10 +203,10 @@ func TestErrorHandling(t *testing.T) {
 			`"Hello" - "World"`,
 			"unknown operator: STRING - STRING",
 		},
-        {
-            `{"name": "Monkey"}[fn(x) { x }];`,
-            "unusable as hash key: FUNCTION",
-        },
+		{
+			`{"name": "Monkey"}[fn(x) { x }];`,
+			"unusable as hash key: FUNCTION",
+		},
 	}
 
 	for _, tt := range tests {
@@ -352,66 +352,66 @@ func TestBuiltinFunction(t *testing.T) {
 }
 
 func TestArrayLiterals(t *testing.T) {
-    input := "[1, 2 * 2, 3 + 3]"
+	input := "[1, 2 * 2, 3 + 3]"
 
-    evaluated := testEval(input)
-    result, ok := evaluated.(*object.Array)
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Array)
 
-    if !ok {
-        t.Fatalf("object is not Array, got=%T (%+v)", evaluated, evaluated) 
-    }
+	if !ok {
+		t.Fatalf("object is not Array, got=%T (%+v)", evaluated, evaluated)
+	}
 
-    if len(result.Elements) != 3 {
-        t.Fatalf("array has wrong num of elements, got=%d", 
-                    len(result.Elements)) 
-    }
+	if len(result.Elements) != 3 {
+		t.Fatalf("array has wrong num of elements, got=%d",
+			len(result.Elements))
+	}
 
-    testIntegerObject(t, result.Elements[0], 1)
-    testIntegerObject(t, result.Elements[1], 4)
-    testIntegerObject(t, result.Elements[2], 6)
+	testIntegerObject(t, result.Elements[0], 1)
+	testIntegerObject(t, result.Elements[1], 4)
+	testIntegerObject(t, result.Elements[2], 6)
 }
 
 func TestArrayIndexingExpressions(t *testing.T) {
-    tests := []struct {
-        input string
-        expected interface{}
-    }{
-    {
-        "[1, 2, 3][0]",
-        1,
-    },
-    {
-        "[1, 2, 3][2]",
-        3,
-    },
-    {
-        "[1, 2, 3][3]",
-        nil,
-    },
-    {
-        "[1, 2, 3][-1]",
-        nil,
-    },
-    {
-        "let myArray = [1, 2, 3]; let x = 0; myArray[x]",
-        1,
-    },
-    }
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			"[1, 2, 3][0]",
+			1,
+		},
+		{
+			"[1, 2, 3][2]",
+			3,
+		},
+		{
+			"[1, 2, 3][3]",
+			nil,
+		},
+		{
+			"[1, 2, 3][-1]",
+			nil,
+		},
+		{
+			"let myArray = [1, 2, 3]; let x = 0; myArray[x]",
+			1,
+		},
+	}
 
-    for _, tt := range tests {
-        evaluated := testEval(tt.input) 
-        integer, ok := tt.expected.(int)
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
 
-        if ok {
-            testIntegerObject(t, evaluated, int64(integer)) 
-        } else {
-            testNullObject(t, evaluated) 
-        }
-    }
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
 }
 
 func TestHashLiterals(t *testing.T) {
-    input := `let two = "two";
+	input := `let two = "two";
                 {
                     "one": 10 - 9,
                     two: 1 + 1,
@@ -421,68 +421,68 @@ func TestHashLiterals(t *testing.T) {
                     false: 6
                 }`
 
-    evaluated := testEval(input)
-    result, ok := evaluated.(*object.Hash)
+	evaluated := testEval(input)
+	result, ok := evaluated.(*object.Hash)
 
-    if !ok {
-        t.Fatalf("Eval didn't return Hash, got=%T (%+v)", evaluated, evaluated) 
-    }
+	if !ok {
+		t.Fatalf("Eval didn't return Hash, got=%T (%+v)", evaluated, evaluated)
+	}
 
-    expected := map[object.HashKey]int64 {
-        (&object.String{Value: "one"}).HashKey(): 1,
-        (&object.String{Value: "two"}).HashKey(): 2,
-        (&object.String{Value: "three"}).HashKey(): 3,
-        (&object.Integer{Value: 4}).HashKey(): 4,
-        TRUE.HashKey(): 5,
-        FALSE.HashKey(): 6,
-    }
+	expected := map[object.HashKey]int64{
+		(&object.String{Value: "one"}).HashKey():   1,
+		(&object.String{Value: "two"}).HashKey():   2,
+		(&object.String{Value: "three"}).HashKey(): 3,
+		(&object.Integer{Value: 4}).HashKey():      4,
+		TRUE.HashKey():                             5,
+		FALSE.HashKey():                            6,
+	}
 
-    if len(result.Pairs) != len(expected) {
-        t.Fatalf("hash has wrong num of pairs, got=%d", len(result.Pairs)) 
-    }
+	if len(result.Pairs) != len(expected) {
+		t.Fatalf("hash has wrong num of pairs, got=%d", len(result.Pairs))
+	}
 
-    for expectedkey, expectedValue := range expected {
-        pair, ok := result.Pairs[expectedkey]
+	for expectedkey, expectedValue := range expected {
+		pair, ok := result.Pairs[expectedkey]
 
-        if !ok {
-            t.Errorf("no pair for given key in Pairs") 
-        }
+		if !ok {
+			t.Errorf("no pair for given key in Pairs")
+		}
 
-        testIntegerObject(t, pair.Value, expectedValue)
-    }
+		testIntegerObject(t, pair.Value, expectedValue)
+	}
 }
 
 func TestHashIndexExpressions(t *testing.T) {
-    tests := []struct {
-        input string
-        expected interface{}
-    }{
-        {
-            `{"foo": 5}["foo"]`,
-            5,
-        },
-        {
-            `{}["foo"]`,
-            nil,
-        },
-        {
-            `{5: 5}[5]`,
-            5,
-        },
-        {
-            `{true: 5}[true]`,
-            5,
-        },
-    }
+	tests := []struct {
+		input    string
+		expected interface{}
+	}{
+		{
+			`{"foo": 5}["foo"]`,
+			5,
+		},
+		{
+			`{}["foo"]`,
+			nil,
+		},
+		{
+			`{5: 5}[5]`,
+			5,
+		},
+		{
+			`{true: 5}[true]`,
+			5,
+		},
+	}
 
-    for _, tt := range tests {
-        evaluated := testEval(tt.input) 
-        integer, ok := tt.expected.(int)
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		integer, ok := tt.expected.(int)
 
-        if ok {
-            testIntegerObject(t, evaluated, int64(integer)) 
-        } else {
-            testNullObject(t, evaluated) 
-        }
-    }
+		if ok {
+			testIntegerObject(t, evaluated, int64(integer))
+		} else {
+			testNullObject(t, evaluated)
+		}
+	}
 }
