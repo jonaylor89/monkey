@@ -3,6 +3,7 @@ package evaluator
 import (
 	"MonkeyInterpreter/object"
 	"fmt"
+    "os"
 )
 
 var builtins = map[string]*object.Builtin{
@@ -119,4 +120,22 @@ var builtins = map[string]*object.Builtin{
 			return NULL
 		},
 	},
+    "exit": &object.Builtin{
+        Fn: func(args ...object.Object) object.Object {
+            if len(args) == 0 {
+                os.Exit(0) 
+            }
+
+            if args[0].Type() != object.INTEGER_OBJ {
+                return newError("argument to `exit` must be INTEGER, got %s", 
+                                args[0].Type()) 
+            }
+
+            arg := args[0].(*object.Integer)
+
+            os.Exit(int(arg.Value))
+
+            return NULL
+        },
+    },
 }
