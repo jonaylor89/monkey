@@ -16,13 +16,13 @@ func main() {
 
 	if len(os.Args) < 2 {
 
-		user, err := user.Current()
+		owner, err := user.Current()
 		if err != nil {
 			panic(err)
 		}
 
 		fmt.Printf("Hello %s! Welcome to interactive mode!\n",
-			user.Username)
+			owner.Username)
 
 		fmt.Printf("Enter commands\n")
 
