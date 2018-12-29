@@ -50,7 +50,7 @@ func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
 	}
 
 	if result.Value != expected {
-		t.Errorf("object has wrong value, got=%d, want=&d",
+		t.Errorf("object has wrong value, got=%d, want=%d",
 			result.Value, expected)
 		return false
 	}
@@ -293,7 +293,7 @@ func TestStringLiteral(t *testing.T) {
 	str, ok := evaluated.(*object.String)
 
 	if !ok {
-		t.Fatalf("object is not string, got=%T", evaluated, evaluated)
+		t.Fatalf("object is not string, got=%T (%+v)", evaluated, evaluated)
 	}
 
 	if str.Value != "hello world" {

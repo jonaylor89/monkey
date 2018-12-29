@@ -282,7 +282,7 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 	}
 
 	if integ.TokenLiteral() != fmt.Sprintf("%d", value) {
-		t.Errorf("integ.TokenLiteral not %d, got=%s", value, integ.TokenLiteral)
+		t.Errorf("integ.TokenLiteral not %d, got=%s", value, integ.TokenLiteral())
 		return false
 	}
 
@@ -477,7 +477,7 @@ func testIdentifier(t *testing.T, exp ast.Expression, value string) bool {
 
 	if ident.TokenLiteral() != value {
 		t.Errorf("ident.TokenLiteral not %s, got=%s",
-			value, ident.TokenLiteral)
+			value, ident.TokenLiteral())
 		return false
 	}
 
@@ -783,7 +783,7 @@ func TestStringLiteralExpression(t *testing.T) {
 	}
 
 	if literal.Value != "hello world" {
-		t.Errorf("literal.Value no %q, got=%q", literal.Value)
+		t.Errorf("literal.Value no %q, got=%q", "hello world", literal.Value)
 	}
 }
 

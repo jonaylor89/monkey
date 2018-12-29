@@ -70,7 +70,7 @@ func TestQuoteUnquote(t *testing.T) {
 		quote, ok := evaluated.(*object.Quote)
 
 		if !ok {
-			t.Fatalf("expected *object.Quote, got=%T (%+v)")
+			t.Fatalf("expected *object.Quote, got=%T (%+v)", quote, quote)
 		}
 
 		if quote.Node == nil {
