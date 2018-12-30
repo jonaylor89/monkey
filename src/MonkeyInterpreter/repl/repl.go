@@ -1,12 +1,12 @@
 package repl
 
 import (
-//	"MonkeyInterpreter/evaluator"
+	//	"MonkeyInterpreter/evaluator"
+	"MonkeyInterpreter/compiler"
 	"MonkeyInterpreter/lexer"
-    "MonkeyInterpreter/object"
+	"MonkeyInterpreter/object"
 	"MonkeyInterpreter/parser"
-    "MonkeyInterpreter/compiler"
-    "MonkeyInterpreter/vm"
+	"MonkeyInterpreter/vm"
 	"bufio"
 	"fmt"
 	"io"
@@ -19,9 +19,9 @@ func Start(in io.Reader, out io.Writer) {
 	// env := object.NewEnvironment()
 	// macroEnv := object.NewEnvironment()
 
-    constants := []object.Object{}
-    globals := make([]object.Object, vm.GlobalsSize)
-    symbolTable := compiler.NewSymbolTable()
+	constants := []object.Object{}
+	globals := make([]object.Object, vm.GlobalsSize)
+	symbolTable := compiler.NewSymbolTable()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -42,38 +42,38 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-        comp := compiler.NewWithState(symbolTable, constants)
-        err := comp.Compile(program)
-        if err != nil {
-            fmt.Fprintf(out, "Compilation failure:\n %s\n", err) 
-            continue
-        }
-
-        code := comp.Bytecode()
-        constants = code.Constants
-
-        machine := vm.NewWithGlobalStore(code, globals)
-        err = machine.Run()
-        if err != nil {
-            fmt.Fprintf(out, "Bytecode execution failure:\n %s\n", err) 
-            continue
-        }
-
-        lastPopped := machine.LastPoppedStackElem()
-        io.WriteString(out, lastPopped.Inspect())
-        io.WriteString(out, "\n")
-        
-/*
-		evaluator.DefineMacros(program, macroEnv)
-		expanded := evaluator.ExpandMacros(program, macroEnv)
-
-		evaluated := evaluator.Eval(expanded, env)
-
-		if evaluated != nil {
-			io.WriteString(out, evaluated.Inspect())
-			io.WriteString(out, "\n")
+		comp := compiler.NewWithState(symbolTable, constants)
+		err := comp.Compile(program)
+		if err != nil {
+			fmt.Fprintf(out, "Compilation failure:\n %s\n", err)
+			continue
 		}
-*/
+
+		code := comp.Bytecode()
+		constants = code.Constants
+
+		machine := vm.NewWithGlobalStore(code, globals)
+		err = machine.Run()
+		if err != nil {
+			fmt.Fprintf(out, "Bytecode execution failure:\n %s\n", err)
+			continue
+		}
+
+		lastPopped := machine.LastPoppedStackElem()
+		io.WriteString(out, lastPopped.Inspect())
+		io.WriteString(out, "\n")
+
+		/*
+			evaluator.DefineMacros(program, macroEnv)
+			expanded := evaluator.ExpandMacros(program, macroEnv)
+
+			evaluated := evaluator.Eval(expanded, env)
+
+			if evaluated != nil {
+				io.WriteString(out, evaluated.Inspect())
+				io.WriteString(out, "\n")
+			}
+		*/
 	}
 
 	fmt.Println("Au revoir")
