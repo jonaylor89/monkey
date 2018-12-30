@@ -549,6 +549,48 @@ func TestCompilerScopes(t *testing.T) {
 	}
 }
 
+func TestFunctionCalls(t *testing.T) {
+    tests := []compilerTestCase{
+        {
+            input: `fn() { 24 }();`,
+            expectedConstants: []interface{}{
+                24,
+                []code.Instructions{
+                    code.Make(code.OpConstant, 0), 
+                    code.Make(code.OpReturnValue),
+                },
+            },
+            expectedInstructions: []code.Instructions{
+                code.Make(code.OpConstant, 1),
+                code.Make(code.OpCall),
+                code.Make(code.OpPop),
+            },
+        },
+        {
+            input: `
+            let noArg = fn() { 24 };
+            noArg();
+            `,
+            expectedConstants: []interface{}{
+                24,
+                []code.Instructions{
+                    code.Make(code.OpConstant, 0), 
+                    code.Make(code.OpReturnValue),
+                },
+            },
+            expectedInstructions: []code.Instructions{
+                code.Make(code.OpConstant, 1), // Compiled Function
+                code.Make(code.OpSetGlobal, 0),
+                code.Make(code.OpGetGlobal, 0),
+                code.Make(code.OpCall),
+                code.Make(code.OpPop),
+            },
+        },
+    }
+
+    runCompilerTests(t, tests)
+}
+
 func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 	t.Helper()
 
