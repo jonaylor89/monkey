@@ -161,78 +161,78 @@ func TestIndexExpression(t *testing.T) {
 }
 
 func TestCallingFunctionsWithoutArguments(t *testing.T) {
-    tests := []vmTestCase{
-        {
-            input:`
+	tests := []vmTestCase{
+		{
+			input: `
             let fivePlusTen = fn() { 5 + 10; };
             fivePlusTen();
             `,
-            expected: 15,
-        },
-        {
-            input:`
+			expected: 15,
+		},
+		{
+			input: `
             let one = fn() { 1; };
             let two = fn() { 2; };
             one() + two();
             `,
-            expected: 3,
-        },
-        {
-            input:`
+			expected: 3,
+		},
+		{
+			input: `
             let a = fn() { 1 };
             let b = fn() { a() + 1 };
             let c = fn() { b() + 1 };
             c();
             `,
-            expected: 3,
-        },
-    }
+			expected: 3,
+		},
+	}
 
-    runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func TestFunctionWithReturnStatement(t *testing.T) {
-    tests := []vmTestCase{
-        {
-            input:`
+	tests := []vmTestCase{
+		{
+			input: `
             let earlyExit = fn() { return 99; 100; };
             earlyExit();
             `,
-            expected: 99,
-        },
-        {
-            input:`
+			expected: 99,
+		},
+		{
+			input: `
             let earlyExit = fn() { return 99; return 100; };
             earlyExit();
             `,
-            expected: 99,
-        },
-    }
+			expected: 99,
+		},
+	}
 
-    runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func TestFunctionsWithoutReturnValue(t *testing.T) {
-    tests := []vmTestCase{
-        {
-            input:`
+	tests := []vmTestCase{
+		{
+			input: `
             let noReturn = fn() { };
             noReturn();
             `,
-            expected: Null,
-        },
-        {
-            input:`
+			expected: Null,
+		},
+		{
+			input: `
             let noReturn = fn() { };
             let noReturnTwo = fn() { noReturn(); };
             noReturn();
             noReturnTwo();
             `,
-            expected: Null,
-        },
-    }
+			expected: Null,
+		},
+	}
 
-    runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func runVmTests(t *testing.T, tests []vmTestCase) {

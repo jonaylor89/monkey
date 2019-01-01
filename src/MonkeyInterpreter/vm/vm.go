@@ -16,35 +16,35 @@ var False = &object.Boolean{Value: false}
 var Null = &object.Null{}
 
 type VM struct {
-	constants    []object.Object
+	constants []object.Object
 
 	stack []object.Object
 	sp    int
 
 	globals []object.Object
 
-    frames []*Frame
-    framesIndex int
+	frames      []*Frame
+	framesIndex int
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
 
-    mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions}
-    mainFrame := NewFrame(mainFn)
+	mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions}
+	mainFrame := NewFrame(mainFn)
 
-    frames := make([]*Frame, MaxFrames)
-    frames[0] = mainFrame
-    
+	frames := make([]*Frame, MaxFrames)
+	frames[0] = mainFrame
+
 	return &VM{
-		constants:    bytecode.Constants,
+		constants: bytecode.Constants,
 
 		stack: make([]object.Object, StackSize),
 		sp:    0,
 
 		globals: make([]object.Object, GlobalsSize),
 
-        frames: frames,
-        framesIndex: 1,
+		frames:      frames,
+		framesIndex: 1,
 	}
 
 }
@@ -65,32 +65,32 @@ func (vm *VM) StackTop() object.Object {
 }
 
 func (vm *VM) currentFrame() *Frame {
-    return vm.frames[vm.framesIndex-1]
+	return vm.frames[vm.framesIndex-1]
 }
 
 func (vm *VM) pushFrame(f *Frame) {
-    vm.frames[vm.framesIndex] = f
-    vm.framesIndex++
+	vm.frames[vm.framesIndex] = f
+	vm.framesIndex++
 }
 
 func (vm *VM) popFrame() *Frame {
-    vm.framesIndex--
-    return vm.frames[vm.framesIndex]
+	vm.framesIndex--
+	return vm.frames[vm.framesIndex]
 }
 
 func (vm *VM) Run() error {
 
-    var ip int
-    var ins code.Instructions
-    var op code.Opcode
+	var ip int
+	var ins code.Instructions
+	var op code.Opcode
 
 	for vm.currentFrame().ip < len(vm.currentFrame().Instructions())-1 {
 
-        vm.currentFrame().ip++
+		vm.currentFrame().ip++
 
-        ip = vm.currentFrame().ip
-        ins = vm.currentFrame().Instructions()
-        op = code.Opcode(ins[ip])
+		ip = vm.currentFrame().ip
+		ins = vm.currentFrame().Instructions()
+		op = code.Opcode(ins[ip])
 
 		switch op {
 		case code.OpConstant:
@@ -212,34 +212,34 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-        case code.OpCall:
-            fn, ok := vm.stack[vm.sp-1].(*object.CompiledFunction)
-            if !ok {
-                return fmt.Errorf("calling non-function") 
-            }
+		case code.OpCall:
+			fn, ok := vm.stack[vm.sp-1].(*object.CompiledFunction)
+			if !ok {
+				return fmt.Errorf("calling non-function")
+			}
 
-            frame := NewFrame(fn)
-            vm.pushFrame(frame)
+			frame := NewFrame(fn)
+			vm.pushFrame(frame)
 
-        case code.OpReturnValue:
-            returnValue := vm.pop()
+		case code.OpReturnValue:
+			returnValue := vm.pop()
 
-            vm.popFrame()
-            vm.pop()
+			vm.popFrame()
+			vm.pop()
 
-            err := vm.push(returnValue)
-            if err != nil {
-                return err 
-            }
+			err := vm.push(returnValue)
+			if err != nil {
+				return err
+			}
 
-        case code.OpReturn:
-            vm.popFrame()
-            vm.pop()
+		case code.OpReturn:
+			vm.popFrame()
+			vm.pop()
 
-            err := vm.push(Null)
-            if err != nil {
-                return err 
-            }
+			err := vm.push(Null)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
