@@ -372,9 +372,7 @@ func TestBuiltinFunctions(t *testing.T) {
                 Message: "argument to `first` must be ARRAY, got INTEGER", 
             },
         },
-        {`last([1, 2, 3])`, 3},
-        {`last([])`, Null},
-        {`last(1)`,
+        {`last([1, 2, 3])`, 3}, {`last([])`, Null}, {`last(1)`,
             &object.Error{
                 Message: "argument to `last` must be ARRAY, got INTEGER", 
             }, 
@@ -386,6 +384,48 @@ func TestBuiltinFunctions(t *testing.T) {
             &object.Error{
                 Message: "argument to `push` must be ARRAY, got INTEGER", 
             },
+        },
+    }
+
+    runVmTests(t, tests)
+}
+
+func TestClosures(t *testing.T) {
+    tests := []vmTestCase{
+        {
+            input: `
+            let newClosure = fn(a) {
+                fn() { a; };
+            }
+            let closure = newClosure(99);
+            closure();
+            `,
+            expected: 99,
+        },
+
+    }
+
+    runVmTests(t, tests)
+}
+
+func TestRecursiveFibonacci(t *testing.T) {
+    tests := []vmTestCase{
+        {
+            input: `
+            let fibonacci = fn(x) {
+                if (x == 0) {
+                    return 0; 
+                } else {
+                    if (x == 1) {
+                        return 1; 
+                    } else {
+                        fibonacci(x - 1) + fibonacci(x - 2);
+                    }
+                }
+            };
+            fibonacci(15);
+            `,
+            expected: 610,
         },
     }
 
