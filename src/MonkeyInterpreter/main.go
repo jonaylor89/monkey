@@ -6,11 +6,16 @@ import (
 	"MonkeyInterpreter/object"
 	"MonkeyInterpreter/parser"
 	"MonkeyInterpreter/repl"
+    "MonkeyInterpreter/compiler"
+    "MonkeyInterpreter/vm"
 	"fmt"
+    "flag"
 	"io/ioutil"
 	"os"
 	"os/user"
 )
+
+var engine = flag.String("engine", "vm", "use 'vm' or 'eval'")
 
 func main() {
 
@@ -35,8 +40,8 @@ func main() {
 			panic(err)
 		}
 
-		env := object.NewEnvironment()
-		macroEnv := object.NewEnvironment()
+		// env := object.NewEnvironment()
+		// macroEnv := object.NewEnvironment()
 		l := lexer.New(string(dat))
 		p := parser.New(l)
 		program := p.ParseProgram()
@@ -49,14 +54,27 @@ func main() {
 			os.Exit(1)
 		}
 
-		evaluator.DefineMacros(program, macroEnv)
-		expanded := evaluator.ExpandMacros(program, macroEnv)
+        if *engine == "vm" {
+            comp := compiler.New() 
+            err = comp.Compile(program)
+            if err != nil {
+                fmt.Printf("compiler error: %s", err) 
+            }
 
-		evaluated := evaluator.Eval(expanded, env)
+            machine := vm.New(comp.Bytecode())
 
-		if evaluated != nil {
-			fmt.Println(evaluated.Inspect())
-		}
+            err = machine.Run()
+            if err != nil {
+                fmt.Printf("vm error: %s", err) 
+                return
+            }
 
-	}
+            result := machine.LastPoppedStackElem()
+        } else {
+            env := object.NewEnvironment() 
+            result := evaluator.Eval(program, env)
+        }
+
+        fmt.Println(result.Inspect())
+    }
 }
