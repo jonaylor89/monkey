@@ -1,9 +1,9 @@
 package evaluator
 
 import (
+	"fmt"
 	"github.com/jonaylor89/monkey/ast"
 	"github.com/jonaylor89/monkey/object"
-	"fmt"
 )
 
 var (
@@ -375,11 +375,11 @@ func applyFunction(fn object.Object, args []object.Object) object.Object {
 		evaluated := Eval(fn.Body, extendedEnv)
 		return unwrapReturnValue(evaluated)
 	case *object.Builtin:
-        if result := fn.Fn(args...); result != nil {
-            return result 
-        }
+		if result := fn.Fn(args...); result != nil {
+			return result
+		}
 
-        return NULL
+		return NULL
 	default:
 		return newError("not a function: %s", fn.Type())
 	}

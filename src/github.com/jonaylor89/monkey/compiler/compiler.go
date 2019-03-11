@@ -1,10 +1,10 @@
 package compiler
 
 import (
+	"fmt"
 	"github.com/jonaylor89/monkey/ast"
 	"github.com/jonaylor89/monkey/code"
 	"github.com/jonaylor89/monkey/object"
-	"fmt"
 	"sort"
 )
 
@@ -41,11 +41,11 @@ func New() *Compiler {
 		previousInstruction: EmittedInstruction{},
 	}
 
-    symbolTable := NewSymbolTable()
+	symbolTable := NewSymbolTable()
 
-    for i, v := range object.Builtins {
-        symbolTable.DefineBuiltin(i, v.Name) 
-    }
+	for i, v := range object.Builtins {
+		symbolTable.DefineBuiltin(i, v.Name)
+	}
 
 	return &Compiler{
 		constants:   []object.Object{},
@@ -195,11 +195,11 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 
-        if symbol.Scope == GlobalScope {
-            c.emit(code.OpSetGlobal, symbol.Index) 
-        } else {
-            c.emit(code.OpSetLocal, symbol.Index)  
-        }
+		if symbol.Scope == GlobalScope {
+			c.emit(code.OpSetGlobal, symbol.Index)
+		} else {
+			c.emit(code.OpSetLocal, symbol.Index)
+		}
 
 	case *ast.Identifier:
 		symbol, ok := c.symbolTable.Resolve(node.Value)
@@ -207,7 +207,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return fmt.Errorf("undefined variable %s", node.Value)
 		}
 
-        c.loadSymbol(symbol)
+		c.loadSymbol(symbol)
 
 	case *ast.IntegerLiteral:
 		integer := &object.Integer{Value: node.Value}
@@ -274,9 +274,9 @@ func (c *Compiler) Compile(node ast.Node) error {
 	case *ast.FunctionLiteral:
 		c.enterScope()
 
-        for _, p := range node.Parameters {
-            c.symbolTable.Define(p.Value) 
-        }
+		for _, p := range node.Parameters {
+			c.symbolTable.Define(p.Value)
+		}
 
 		err := c.Compile(node.Body)
 		if err != nil {
@@ -291,21 +291,21 @@ func (c *Compiler) Compile(node ast.Node) error {
 			c.emit(code.OpReturn)
 		}
 
-        freeSymbols := c.symbolTable.FreeSymbols
-        numLocals := c.symbolTable.numDefinitions
+		freeSymbols := c.symbolTable.FreeSymbols
+		numLocals := c.symbolTable.numDefinitions
 		instructions := c.leaveScope()
 
-        for _, s := range freeSymbols {
-            c.loadSymbol(s) 
-        }
+		for _, s := range freeSymbols {
+			c.loadSymbol(s)
+		}
 
 		compiledFn := &object.CompiledFunction{
-            Instructions:   instructions,
-            NumLocals:      numLocals, 
-            NumParameters:  len(node.Parameters),
-        }
+			Instructions:  instructions,
+			NumLocals:     numLocals,
+			NumParameters: len(node.Parameters),
+		}
 
-        fnIndex := c.addConstant(compiledFn)
+		fnIndex := c.addConstant(compiledFn)
 		c.emit(code.OpClosure, fnIndex, len(freeSymbols))
 
 	case *ast.ReturnStatement:
@@ -322,15 +322,15 @@ func (c *Compiler) Compile(node ast.Node) error {
 			return err
 		}
 
-        for _, a := range node.Arguments {
-            err := c.Compile(a) 
-            if err != nil {
-                return err 
-            }
-        }
+		for _, a := range node.Arguments {
+			err := c.Compile(a)
+			if err != nil {
+				return err
+			}
+		}
 
 		c.emit(code.OpCall, len(node.Arguments))
-        
+
 	}
 
 	return nil
@@ -430,7 +430,7 @@ func (c *Compiler) enterScope() {
 	c.scopes = append(c.scopes, scope)
 	c.scopeIndex++
 
-    c.symbolTable = NewEnclosedSymbolTable(c.symbolTable)
+	c.symbolTable = NewEnclosedSymbolTable(c.symbolTable)
 }
 
 func (c *Compiler) leaveScope() code.Instructions {
@@ -439,37 +439,20 @@ func (c *Compiler) leaveScope() code.Instructions {
 	c.scopes = c.scopes[:len(c.scopes)-1]
 	c.scopeIndex--
 
-    c.symbolTable = c.symbolTable.Outer
+	c.symbolTable = c.symbolTable.Outer
 
 	return instructions
 }
 
 func (c *Compiler) loadSymbol(s Symbol) {
-    switch s.Scope {
-    case GlobalScope:
-        c.emit(code.OpGetGlobal, s.Index)
-    case LocalScope:
-        c.emit(code.OpGetLocal, s.Index)
-    case BuiltinScope:
-        c.emit(code.OpGetBuiltin, s.Index)
-    case FreeScope:
-        c.emit(code.OpGetFree, s.Index)
-    }
+	switch s.Scope {
+	case GlobalScope:
+		c.emit(code.OpGetGlobal, s.Index)
+	case LocalScope:
+		c.emit(code.OpGetLocal, s.Index)
+	case BuiltinScope:
+		c.emit(code.OpGetBuiltin, s.Index)
+	case FreeScope:
+		c.emit(code.OpGetFree, s.Index)
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

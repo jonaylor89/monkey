@@ -1,12 +1,12 @@
 package vm
 
 import (
+	"fmt"
 	"github.com/jonaylor89/monkey/ast"
 	"github.com/jonaylor89/monkey/compiler"
 	"github.com/jonaylor89/monkey/lexer"
 	"github.com/jonaylor89/monkey/object"
 	"github.com/jonaylor89/monkey/parser"
-	"fmt"
 	"testing"
 )
 
@@ -236,39 +236,39 @@ func TestFunctionsWithoutReturnValue(t *testing.T) {
 }
 
 func TestCallingFunctionsWithBindings(t *testing.T) {
-    tests := []vmTestCase{
-        {
-            input:`
+	tests := []vmTestCase{
+		{
+			input: `
             let one = fn() { let one = 1; one };
             one();
             `,
-            expected: 1,
-        },
-        {
-            input:`
+			expected: 1,
+		},
+		{
+			input: `
             let oneAndTwo = fn() { let one = 1; let two = 2; one + two; };
             oneAndTwo();
             `,
-            expected: 3,
-        },
-        {
-            input:`
+			expected: 3,
+		},
+		{
+			input: `
             let oneAndTwo = fn() { let one = 1; let two = 2; one + two; };
             let threeAndFour = fn() { let three = 3; let four = 4; three + four; };
             oneAndTwo() + threeAndFour();
             `,
-            expected: 10,
-        },
-        {
-            input:`
+			expected: 10,
+		},
+		{
+			input: `
             let firstFoobar = fn() { let foobar = 50; foobar; };
             let secondFoobar = fn() { let foobar = 100; foobar; };
             firstFoobar() + secondFoobar();
            `,
-           expected: 150,
-        },
-        {
-            input:`
+			expected: 150,
+		},
+		{
+			input: `
             let globalSeed = 50;
             let minusOne = fn() {
                 let num = 1;
@@ -280,138 +280,137 @@ func TestCallingFunctionsWithBindings(t *testing.T) {
             }
             minusOne() + minusTwo();
             `,
-            expected: 97,
-        },
-    }
+			expected: 97,
+		},
+	}
 
-    runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func TestCallingFunctionsWithArguments(t *testing.T) {
-    tests := []vmTestCase{
-        {
-            input: `
+	tests := []vmTestCase{
+		{
+			input: `
             let identity = fn(a) { a; };
             identity(4);
             `,
-            expected: 4,
-        },
-        {
-            input: `
+			expected: 4,
+		},
+		{
+			input: `
             let sum = fn(a, b) { a + b; };
             sum(1, 2);
             `,
-            expected: 3,
-        },
-    }
+			expected: 3,
+		},
+	}
 
-    runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func TestCallingFunctionWithWrongArguments(t *testing.T) {
-    tests := []vmTestCase{
-        {
-            input: `fn() { 1; }(1);`,
-            expected: `wrong number of arguments: want=0, got=1`,
-        },
-        {
-            input: `fn(a) { a; }();`,
-            expected: `wrong number of arguments: want=1, got=0`,
-        },
-        {
-            input: `fn(a, b) { a + b; }(1);`,
-            expected: `wrong number of arguments: want=2, got=1`,
-        },
-    }
+	tests := []vmTestCase{
+		{
+			input:    `fn() { 1; }(1);`,
+			expected: `wrong number of arguments: want=0, got=1`,
+		},
+		{
+			input:    `fn(a) { a; }();`,
+			expected: `wrong number of arguments: want=1, got=0`,
+		},
+		{
+			input:    `fn(a, b) { a + b; }(1);`,
+			expected: `wrong number of arguments: want=2, got=1`,
+		},
+	}
 
-    for _, tt := range tests {
-        program := parse(tt.input) 
+	for _, tt := range tests {
+		program := parse(tt.input)
 
-        comp := compiler.New()
-        err := comp.Compile(program)
-        if err != nil {
-            t.Fatalf("compile error: %s", err) 
-        }
+		comp := compiler.New()
+		err := comp.Compile(program)
+		if err != nil {
+			t.Fatalf("compile error: %s", err)
+		}
 
-        vm := New(comp.Bytecode())
-        err = vm.Run()
-        if err == nil {
-            t.Fatalf("expected VM error but resulted in none.") 
-        }
+		vm := New(comp.Bytecode())
+		err = vm.Run()
+		if err == nil {
+			t.Fatalf("expected VM error but resulted in none.")
+		}
 
-        if err.Error() != tt.expected {
-            t.Fatalf("wrong VM error: want=%q, got=%q", tt.expected, err) 
-        }
-    }
+		if err.Error() != tt.expected {
+			t.Fatalf("wrong VM error: want=%q, got=%q", tt.expected, err)
+		}
+	}
 
 }
 
 func TestBuiltinFunctions(t *testing.T) {
-    tests := []vmTestCase{
-        {`len("")`, 0},
-        {`len("four")`, 4},
-        {`len("hello world")`, 11},
-        {
-            `len(1)`,
-            &object.Error{
-                Message: "argument to `len` not supported, got INTEGER",
-            },
-        },
-        {`len("one", "two")`,
-           &object.Error{
-                Message: "wrong number of arguments, got=2 want=1", 
-            },
-        },
-        {`len([1, 2, 3])`, 3},
-        {`len([])`, 0},
-        {`puts("hello", "world!")`, Null},
-        {`first([1, 2, 3])`, 1},
-        {`first([])`, Null},
-        {`first(1)`,
-            &object.Error{
-                Message: "argument to `first` must be ARRAY, got INTEGER", 
-            },
-        },
-        {`last([1, 2, 3])`, 3}, {`last([])`, Null}, {`last(1)`,
-            &object.Error{
-                Message: "argument to `last` must be ARRAY, got INTEGER", 
-            }, 
-        },
-        {`rest([1, 2, 3])`, []int{2, 3}},
-        {`rest([])`, Null},
-        {`push([], 1)`, []int{1}},
-        {`push(1, 1)`,
-            &object.Error{
-                Message: "argument to `push` must be ARRAY, got INTEGER", 
-            },
-        },
-    }
+	tests := []vmTestCase{
+		{`len("")`, 0},
+		{`len("four")`, 4},
+		{`len("hello world")`, 11},
+		{
+			`len(1)`,
+			&object.Error{
+				Message: "argument to `len` not supported, got INTEGER",
+			},
+		},
+		{`len("one", "two")`,
+			&object.Error{
+				Message: "wrong number of arguments, got=2 want=1",
+			},
+		},
+		{`len([1, 2, 3])`, 3},
+		{`len([])`, 0},
+		{`puts("hello", "world!")`, Null},
+		{`first([1, 2, 3])`, 1},
+		{`first([])`, Null},
+		{`first(1)`,
+			&object.Error{
+				Message: "argument to `first` must be ARRAY, got INTEGER",
+			},
+		},
+		{`last([1, 2, 3])`, 3}, {`last([])`, Null}, {`last(1)`,
+			&object.Error{
+				Message: "argument to `last` must be ARRAY, got INTEGER",
+			},
+		},
+		{`rest([1, 2, 3])`, []int{2, 3}},
+		{`rest([])`, Null},
+		{`push([], 1)`, []int{1}},
+		{`push(1, 1)`,
+			&object.Error{
+				Message: "argument to `push` must be ARRAY, got INTEGER",
+			},
+		},
+	}
 
-    runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func TestClosures(t *testing.T) {
-    tests := []vmTestCase{
-        {
-            input: `
+	tests := []vmTestCase{
+		{
+			input: `
             let newClosure = fn(a) {
                 fn() { a; };
             }
             let closure = newClosure(99);
             closure();
             `,
-            expected: 99,
-        },
+			expected: 99,
+		},
+	}
 
-    }
-
-    runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func TestRecursiveFibonacci(t *testing.T) {
-    tests := []vmTestCase{
-        {
-            input: `
+	tests := []vmTestCase{
+		{
+			input: `
             let fibonacci = fn(x) {
                 if (x == 0) {
                     return 0; 
@@ -425,11 +424,11 @@ func TestRecursiveFibonacci(t *testing.T) {
             };
             fibonacci(15);
             `,
-            expected: 610,
-        },
-    }
+			expected: 610,
+		},
+	}
 
-    runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func runVmTests(t *testing.T, tests []vmTestCase) {
@@ -524,16 +523,16 @@ func testExpectedObject(
 				t.Errorf("testIntegerObject failed: %s", err)
 			}
 		}
-    case *object.Error:
-        errObj, ok := actual.(*object.Error)
-        if !ok {
-            t.Errorf("object is not Error: %T (%+v)", actual, actual) 
-            return
-        }
-        if errObj.Message != expected.Message {
-            t.Errorf("wrong error message. expect=%q, got=%q",
-                        expected.Message, errObj.Message) 
-        }
+	case *object.Error:
+		errObj, ok := actual.(*object.Error)
+		if !ok {
+			t.Errorf("object is not Error: %T (%+v)", actual, actual)
+			return
+		}
+		if errObj.Message != expected.Message {
+			t.Errorf("wrong error message. expect=%q, got=%q",
+				expected.Message, errObj.Message)
+		}
 	case *object.Null:
 		if actual != Null {
 			t.Errorf("object is not NULL: %T (%+v)", actual, actual)

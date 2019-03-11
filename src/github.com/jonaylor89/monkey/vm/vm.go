@@ -1,10 +1,10 @@
 package vm
 
 import (
+	"fmt"
 	"github.com/jonaylor89/monkey/code"
 	"github.com/jonaylor89/monkey/compiler"
 	"github.com/jonaylor89/monkey/object"
-	"fmt"
 )
 
 const StackSize = 2048
@@ -30,7 +30,7 @@ type VM struct {
 func New(bytecode *compiler.Bytecode) *VM {
 
 	mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions}
-    mainClosure := &object.Closure{Fn: mainFn}
+	mainClosure := &object.Closure{Fn: mainFn}
 	mainFrame := NewFrame(mainClosure, 0)
 
 	frames := make([]*Frame, MaxFrames)
@@ -215,19 +215,18 @@ func (vm *VM) Run() error {
 
 		case code.OpCall:
 
-            numArgs := code.ReadUint8(ins[ip+1:])
-            vm.currentFrame().ip += 1
+			numArgs := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
 
-            err := vm.executeCall(int(numArgs))
-            if err != nil {
-                return err 
-            }
-
+			err := vm.executeCall(int(numArgs))
+			if err != nil {
+				return err
+			}
 
 		case code.OpReturnValue:
 			returnValue := vm.pop()
 
-            frame := vm.popFrame()
+			frame := vm.popFrame()
 			vm.sp = frame.basePointer - 1
 
 			err := vm.push(returnValue)
@@ -236,7 +235,7 @@ func (vm *VM) Run() error {
 			}
 
 		case code.OpReturn:
-            frame := vm.popFrame()
+			frame := vm.popFrame()
 			vm.sp = frame.basePointer - 1
 
 			err := vm.push(Null)
@@ -244,120 +243,119 @@ func (vm *VM) Run() error {
 				return err
 			}
 
-        case code.OpSetLocal:
-            localIndex := code.ReadUint8(ins[ip+1:])
-            vm.currentFrame().ip += 1
+		case code.OpSetLocal:
+			localIndex := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
 
-            frame := vm.currentFrame()
+			frame := vm.currentFrame()
 
-            vm.stack[frame.basePointer + int(localIndex)] = vm.pop()
+			vm.stack[frame.basePointer+int(localIndex)] = vm.pop()
 
-        case code.OpGetLocal:
-            localIndex := code.ReadUint8(ins[ip+1:])
-            vm.currentFrame().ip += 1
+		case code.OpGetLocal:
+			localIndex := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
 
-            frame := vm.currentFrame()
+			frame := vm.currentFrame()
 
-            err := vm.push(vm.stack[frame.basePointer + int(localIndex)])
-            if err != nil {
-                return err 
-            }
+			err := vm.push(vm.stack[frame.basePointer+int(localIndex)])
+			if err != nil {
+				return err
+			}
 
-        case code.OpGetBuiltin:
-            builtinIndex := code.ReadUint8(ins[ip+1:])
-            vm.currentFrame().ip += 1
+		case code.OpGetBuiltin:
+			builtinIndex := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
 
-            definition := object.Builtins[builtinIndex]
+			definition := object.Builtins[builtinIndex]
 
-            err := vm.push(definition.Builtin)
-            if err != nil {
-                return err 
-            }
+			err := vm.push(definition.Builtin)
+			if err != nil {
+				return err
+			}
 
-        case code.OpClosure:
-            constIndex := code.ReadUint16(ins[ip+1:])
-            numFree := code.ReadUint8(ins[ip+3:])
-            vm.currentFrame().ip += 3
+		case code.OpClosure:
+			constIndex := code.ReadUint16(ins[ip+1:])
+			numFree := code.ReadUint8(ins[ip+3:])
+			vm.currentFrame().ip += 3
 
-            err := vm.pushClosure(int(constIndex), int(numFree))
-            if err != nil {
-                return err 
-            }
+			err := vm.pushClosure(int(constIndex), int(numFree))
+			if err != nil {
+				return err
+			}
 
-        case code.OpGetFree:
-            freeIndex := code.ReadUint8(ins[ip+1:])
-            vm.currentFrame().ip += 1
+		case code.OpGetFree:
+			freeIndex := code.ReadUint8(ins[ip+1:])
+			vm.currentFrame().ip += 1
 
-            currentClosure := vm.currentFrame().cl
-            err := vm.push(currentClosure.Free[freeIndex])
-            if err != nil {
-                return err 
-            }
+			currentClosure := vm.currentFrame().cl
+			err := vm.push(currentClosure.Free[freeIndex])
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	return nil
 }
 
-
 func (vm *VM) pushClosure(constIndex int, numFree int) error {
-    constant := vm.constants[constIndex]
-    function, ok := constant.(*object.CompiledFunction)
-    if !ok {
-        return fmt.Errorf("not a function: %+v", constant) 
-    }
+	constant := vm.constants[constIndex]
+	function, ok := constant.(*object.CompiledFunction)
+	if !ok {
+		return fmt.Errorf("not a function: %+v", constant)
+	}
 
-    free := make([]object.Object, numFree)
-    for i := 0; i < numFree; i++ {
-        free[i] = vm.stack[vm.sp-numFree+i] 
-    }
-    vm.sp = vm.sp - numFree
+	free := make([]object.Object, numFree)
+	for i := 0; i < numFree; i++ {
+		free[i] = vm.stack[vm.sp-numFree+i]
+	}
+	vm.sp = vm.sp - numFree
 
-    closure := &object.Closure{Fn: function, Free: free}
+	closure := &object.Closure{Fn: function, Free: free}
 
-    return vm.push(closure)
+	return vm.push(closure)
 }
 
 func (vm *VM) executeCall(numArgs int) error {
-    callee := vm.stack[vm.sp-1-numArgs]
-    switch callee := callee.(type) {
-    case *object.Closure:
-        return vm.callClosure(callee, numArgs)
-    case *object.Builtin:
-        return vm.callBuiltin(callee, numArgs)
-    default:
-        return fmt.Errorf("calling non-function and non-built-in")
-    }
+	callee := vm.stack[vm.sp-1-numArgs]
+	switch callee := callee.(type) {
+	case *object.Closure:
+		return vm.callClosure(callee, numArgs)
+	case *object.Builtin:
+		return vm.callBuiltin(callee, numArgs)
+	default:
+		return fmt.Errorf("calling non-function and non-built-in")
+	}
 }
 
 func (vm *VM) callClosure(cl *object.Closure, numArgs int) error {
 
-    if numArgs != cl.Fn.NumParameters {
-        return fmt.Errorf("wrong number of arguments: want=%d, got=%d",
-                            cl.Fn.NumParameters, numArgs) 
-    }
+	if numArgs != cl.Fn.NumParameters {
+		return fmt.Errorf("wrong number of arguments: want=%d, got=%d",
+			cl.Fn.NumParameters, numArgs)
+	}
 
-    frame := NewFrame(cl, vm.sp-numArgs)
-    vm.pushFrame(frame)
+	frame := NewFrame(cl, vm.sp-numArgs)
+	vm.pushFrame(frame)
 
-    vm.sp = frame.basePointer + cl.Fn.NumLocals
+	vm.sp = frame.basePointer + cl.Fn.NumLocals
 
-    return nil
+	return nil
 }
 
 func (vm *VM) callBuiltin(builtin *object.Builtin, numArgs int) error {
-    args := vm.stack[vm.sp-numArgs : vm.sp]
+	args := vm.stack[vm.sp-numArgs : vm.sp]
 
-    result := builtin.Fn(args...)
-    vm.sp = vm.sp - numArgs - 1
+	result := builtin.Fn(args...)
+	vm.sp = vm.sp - numArgs - 1
 
-    if result != nil {
-        return vm.push(result) 
-    } else {
-        return vm.push(Null) 
-    }
+	if result != nil {
+		return vm.push(result)
+	} else {
+		return vm.push(Null)
+	}
 
-    return nil
+	return nil
 }
 
 func (vm *VM) buildHash(startIndex, endIndex int) (object.Object, error) {

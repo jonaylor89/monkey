@@ -1,8 +1,8 @@
 package ast
 
 import (
-	"github.com/jonaylor89/monkey/token"
 	"bytes"
+	"github.com/jonaylor89/monkey/token"
 	"strings"
 )
 

@@ -1,10 +1,10 @@
 package object
 
 import (
-	"github.com/jonaylor89/monkey/ast"
-	"github.com/jonaylor89/monkey/code"
 	"bytes"
 	"fmt"
+	"github.com/jonaylor89/monkey/ast"
+	"github.com/jonaylor89/monkey/code"
 	"hash/fnv"
 	"strings"
 )
@@ -23,7 +23,7 @@ const (
 	QUOTE_OBJ             = "QUOTE"
 	MACRO_OBJ             = "MACRO"
 	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
-    CLOSURE_OBJ           = "CLOSURE"
+	CLOSURE_OBJ           = "CLOSURE"
 )
 
 type ObjectType string
@@ -221,9 +221,9 @@ func (m *Macro) Inspect() string {
 }
 
 type CompiledFunction struct {
-	Instructions    code.Instructions
-    NumLocals       int
-    NumParameters  int
+	Instructions  code.Instructions
+	NumLocals     int
+	NumParameters int
 }
 
 func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION_OBJ }
@@ -232,11 +232,11 @@ func (cf *CompiledFunction) Inspect() string {
 }
 
 type Closure struct {
-    Fn      *CompiledFunction
-    Free    []Object
+	Fn   *CompiledFunction
+	Free []Object
 }
 
 func (c *Closure) Type() ObjectType { return CLOSURE_OBJ }
 func (c *Closure) Inspect() string {
-    return fmt.Sprintf("Closure[%p]", c)
+	return fmt.Sprintf("Closure[%p]", c)
 }

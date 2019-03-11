@@ -3,10 +3,10 @@ package compiler
 type SymbolScope string
 
 const (
-	GlobalScope SymbolScope = "GLOBAL"
-    LocalScope SymbolScope = "LOCAL"
-    BuiltinScope SymbolScope = "BUILTIN"
-    FreeScope SymbolScope = "FREE"
+	GlobalScope  SymbolScope = "GLOBAL"
+	LocalScope   SymbolScope = "LOCAL"
+	BuiltinScope SymbolScope = "BUILTIN"
+	FreeScope    SymbolScope = "FREE"
 )
 
 type Symbol struct {
@@ -15,37 +15,37 @@ type Symbol struct {
 	Index int
 }
 
-type SymbolTable struct { 
-    Outer          *SymbolTable
+type SymbolTable struct {
+	Outer *SymbolTable
 
 	store          map[string]Symbol
 	numDefinitions int
 
-    FreeSymbols []Symbol
+	FreeSymbols []Symbol
 }
 
 func NewSymbolTable() *SymbolTable {
 	s := make(map[string]Symbol)
-    free := []Symbol{}
+	free := []Symbol{}
 
-    return &SymbolTable{store: s, FreeSymbols: free}
+	return &SymbolTable{store: s, FreeSymbols: free}
 }
 
 func NewEnclosedSymbolTable(outer *SymbolTable) *SymbolTable {
-    s := NewSymbolTable()
-    s.Outer = outer
+	s := NewSymbolTable()
+	s.Outer = outer
 
-    return s
+	return s
 }
 
 func (s *SymbolTable) Define(name string) Symbol {
 	symbol := Symbol{Name: name, Index: s.numDefinitions}
 
-    if s.Outer == nil {
-        symbol.Scope = GlobalScope 
-    } else {
-        symbol.Scope = LocalScope 
-    }
+	if s.Outer == nil {
+		symbol.Scope = GlobalScope
+	} else {
+		symbol.Scope = LocalScope
+	}
 
 	s.store[name] = symbol
 	s.numDefinitions++
@@ -56,51 +56,37 @@ func (s *SymbolTable) Define(name string) Symbol {
 func (s *SymbolTable) Resolve(name string) (Symbol, bool) {
 	obj, ok := s.store[name]
 
-    if !ok && s.Outer != nil {
-        obj, ok = s.Outer.Resolve(name)  
-        if !ok {
-            return obj, ok 
-        }
+	if !ok && s.Outer != nil {
+		obj, ok = s.Outer.Resolve(name)
+		if !ok {
+			return obj, ok
+		}
 
-        if obj.Scope ==GlobalScope || obj.Scope == BuiltinScope {
-            return obj, ok 
-        }
+		if obj.Scope == GlobalScope || obj.Scope == BuiltinScope {
+			return obj, ok
+		}
 
-        free := s.defineFree(obj)
-        return free, true
-    }
+		free := s.defineFree(obj)
+		return free, true
+	}
 
 	return obj, ok
 }
 
 func (s *SymbolTable) DefineBuiltin(index int, name string) Symbol {
-    symbol := Symbol{Name: name, Index: index, Scope: BuiltinScope}
-    s.store[name] = symbol
+	symbol := Symbol{Name: name, Index: index, Scope: BuiltinScope}
+	s.store[name] = symbol
 
-    return symbol
+	return symbol
 }
 
 func (s *SymbolTable) defineFree(original Symbol) Symbol {
-    s.FreeSymbols = append(s.FreeSymbols, original)
+	s.FreeSymbols = append(s.FreeSymbols, original)
 
-    symbol := Symbol{Name: original.Name, Index: len(s.FreeSymbols) - 1}
-    symbol.Scope = FreeScope
+	symbol := Symbol{Name: original.Name, Index: len(s.FreeSymbols) - 1}
+	symbol.Scope = FreeScope
 
-    s.store[original.Name] = symbol
+	s.store[original.Name] = symbol
 
-    return symbol
+	return symbol
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

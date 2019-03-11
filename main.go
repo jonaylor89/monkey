@@ -1,15 +1,15 @@
 package main
 
 import (
+	"flag"
+	"fmt"
+	"github.com/jonaylor89/monkey/compiler"
 	"github.com/jonaylor89/monkey/evaluator"
 	"github.com/jonaylor89/monkey/lexer"
 	"github.com/jonaylor89/monkey/object"
 	"github.com/jonaylor89/monkey/parser"
 	"github.com/jonaylor89/monkey/repl"
-    "github.com/jonaylor89/monkey/compiler"
-    "github.com/jonaylor89/monkey/vm"
-	"fmt"
-    "flag"
+	"github.com/jonaylor89/monkey/vm"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -54,29 +54,29 @@ func main() {
 			os.Exit(1)
 		}
 
-    var result object.Object
+		var result object.Object
 
-    if *engine == "vm" {
-      comp := compiler.New() 
-      err = comp.Compile(program)
-      if err != nil {
-          fmt.Printf("compiler error: %s", err) 
-      }
+		if *engine == "vm" {
+			comp := compiler.New()
+			err = comp.Compile(program)
+			if err != nil {
+				fmt.Printf("compiler error: %s", err)
+			}
 
-      machine := vm.New(comp.Bytecode())
+			machine := vm.New(comp.Bytecode())
 
-      err = machine.Run()
-      if err != nil {
-          fmt.Printf("vm error: %s", err) 
-          return
-      }
+			err = machine.Run()
+			if err != nil {
+				fmt.Printf("vm error: %s", err)
+				return
+			}
 
-      result = machine.LastPoppedStackElem()
-    } else {
-        env := object.NewEnvironment() 
-        result = evaluator.Eval(program, env)
-    }
+			result = machine.LastPoppedStackElem()
+		} else {
+			env := object.NewEnvironment()
+			result = evaluator.Eval(program, env)
+		}
 
-    fmt.Println(result.Inspect())
-  }
+		fmt.Println(result.Inspect())
+	}
 }

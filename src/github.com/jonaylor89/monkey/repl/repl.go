@@ -2,13 +2,13 @@ package repl
 
 import (
 	//	"github.com/jonaylor89/monkey/evaluator"
+	"bufio"
+	"fmt"
 	"github.com/jonaylor89/monkey/compiler"
 	"github.com/jonaylor89/monkey/lexer"
 	"github.com/jonaylor89/monkey/object"
 	"github.com/jonaylor89/monkey/parser"
 	"github.com/jonaylor89/monkey/vm"
-	"bufio"
-	"fmt"
 	"io"
 )
 
@@ -22,9 +22,9 @@ func Start(in io.Reader, out io.Writer) {
 	constants := []object.Object{}
 	globals := make([]object.Object, vm.GlobalsSize)
 	symbolTable := compiler.NewSymbolTable()
-    for i, v := range object.Builtins {
-        symbolTable.DefineBuiltin(i, v.Name) 
-    }
+	for i, v := range object.Builtins {
+		symbolTable.DefineBuiltin(i, v.Name)
+	}
 
 	for {
 		fmt.Printf(PROMPT)
