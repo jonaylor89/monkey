@@ -40,6 +40,7 @@ const (
 	OpReturn
 	OpGetBuiltin
 	OpClosure
+  OpCurrentClosure
 )
 
 type Definition struct {
@@ -77,6 +78,7 @@ var definitions = map[Opcode]*Definition{
 	OpReturn:        {"OpReturn", []int{}},
 	OpGetBuiltin:    {"OpGetBuiltin", []int{1}},
 	OpClosure:       {"OpClosure", []int{2, 1}},
+  OpCurrentClosure:{"OpCurrentClosure", []int{}},
 }
 
 func Lookup(op byte) (*Definition, error) {
