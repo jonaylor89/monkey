@@ -1,8 +1,8 @@
 package vm
 
 import (
-	"github.com/jonaylor89/monkey/code"
-	"github.com/jonaylor89/monkey/object"
+	"github.com/jonaylor89/MonkeyInterpreter/code"
+	"github.com/jonaylor89/MonkeyInterpreter/object"
 )
 
 type Frame struct {

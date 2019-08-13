@@ -4,11 +4,11 @@ import (
 	//	"github.com/jonaylor89/monkey/evaluator"
 	"bufio"
 	"fmt"
-	"github.com/jonaylor89/monkey/compiler"
-	"github.com/jonaylor89/monkey/lexer"
-	"github.com/jonaylor89/monkey/object"
-	"github.com/jonaylor89/monkey/parser"
-	"github.com/jonaylor89/monkey/vm"
+	"github.com/jonaylor89/MonkeyInterpreter/compiler"
+	"github.com/jonaylor89/MonkeyInterpreter/lexer"
+	"github.com/jonaylor89/MonkeyInterpreter/object"
+	"github.com/jonaylor89/MonkeyInterpreter/parser"
+	"github.com/jonaylor89/MonkeyInterpreter/vm"
 	"io"
 )
 
