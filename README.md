@@ -1,6 +1,6 @@
 # MonkeyInterpreter
 
-Interpreter for the monkey programming language
+Interpreter for the MonkeyInterpreter programming language
 
 ![Monkey Logo](assets/MonkeyLangLogo.png)
 

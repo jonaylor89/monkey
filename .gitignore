@@ -3,3 +3,5 @@ fibonacci
 .gitignore
 monkey
 MonkeyInterpreter
+
+*.go-e

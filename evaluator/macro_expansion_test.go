@@ -1,10 +1,10 @@
 package evaluator
 
 import (
-	"github.com/jonaylor89/monkey/ast"
-	"github.com/jonaylor89/monkey/lexer"
-	"github.com/jonaylor89/monkey/object"
-	"github.com/jonaylor89/monkey/parser"
+	"github.com/jonaylor89/MonkeyInterpreter/ast"
+	"github.com/jonaylor89/MonkeyInterpreter/lexer"
+	"github.com/jonaylor89/MonkeyInterpreter/object"
+	"github.com/jonaylor89/MonkeyInterpreter/parser"
 	"testing"
 )
 

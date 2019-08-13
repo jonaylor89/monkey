@@ -29,7 +29,7 @@ func main() {
 		fmt.Printf("Hello %s! Welcome to interactive mode!\n",
 			owner.Username)
 
-		fmt.Printf("Enter monkey code\n")
+		fmt.Printf("Enter MonkeyInterpreter code\n")
 
 		repl.Start(os.Stdin, os.Stdout)
 

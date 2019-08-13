@@ -1,7 +1,7 @@
 package repl
 
 import (
-	//	"github.com/jonaylor89/monkey/evaluator"
+	//	"github.com/jonaylor89/MonkeyInterpreter/evaluator"
 	"bufio"
 	"fmt"
 	"github.com/jonaylor89/MonkeyInterpreter/compiler"
