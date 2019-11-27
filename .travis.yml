@@ -8,6 +8,6 @@ deploy:
   provider: releases
   api_key:
     secure: VCoGqYIzAKU0OfpV4+DxEY8mEpIZSqmD5Dv7QwgsOEhQ7TDzPyOssJkXNpHiq67fPRdyqM2+oAgN2XLyJ/Ht9e/NdUi+wfjMFi3wQIaVw+BkAnpEuoYclpfmOIc2QPNvG1+tfP80VYpBUntNFPkB2RJAMJwRo3aPeYX4pgF9xBDAncG4weWHkByTilxdryShWMwAbQku3bszwyQIZ9QAWpc6aWEyrg30uY3AQUkpV+s/MNkloQO0OycMAK/HqiH32CPyCpTIAbqi87FRkLKwEKDP6aQuEVCiizq3Z3ynkqmmsRdPTVpTfDsyygdyyzosDgQfIcf/TMwdCvS6Y/1e6poFGzW0yaP6RSYgTJnrmMjcBJ059youv6MKUtNG4za1iNewfE/Wl047bgH3fNRUjruqgxP6x7w5Rwl1EduE0n6tOzwwBh852ZwqVWbvqWtgclMNRxglmd/ZcKV4r3tWhdyNMh0gKeB+pGqPfTXmbWx4+OMc78pikIwP1F2oKzRO+K2RPueptddDtj/bon08wwn3bSvMhG+gnrB+vpVwS0oXyiOvv3I/fZzP3Hd0NisjsNj4rWxp3Puh+cmIQrNzwRjZzx2uIzwXlBMKhMOgpq2iX5Qp5HD0fJJOPDKa8dlr0hhoTDVbbMxu8xsgJor1jRHQc6mQ8GYLNKyFJMYk8mg=
-  file: 'deployment/${PROJECT_NAME}-${TRAVIS_TAG}-${TARGET}.tar.gz'
+  file: 'monkey'
   on:
     repo: jonaylor89/MonkeyInterpreter
