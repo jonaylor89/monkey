@@ -369,3 +369,23 @@ func (ml *MacroLiteral) String() string {
 
 	return out.String()
 }
+
+type WhileLoopStatement struct {
+	Token      token.Token
+	Condition  Expression
+	Body 	   *BlockStatement
+}
+
+func (wl *WhileLoopStatement) statementNode()       {}
+func (wl *WhileLoopStatement) TokenLiteral() string { return wl.Token.Literal }
+func (wl *WhileLoopStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString("while (")
+	out.WriteString(wl.Condition.String())
+	out.WriteString(") ")
+	out.WriteString(wl.Body.String())
+
+	return out.String()
+}
+

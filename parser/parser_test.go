@@ -992,6 +992,34 @@ func TestMacroLiteralParsing(t *testing.T) {
 
 }
 
+func TestWhileLoopStatementParsing(t *testing.T) {
+	input := `while (x > 5) { }`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not contain %d statements, got=%d\n",
+			1, len(program.Statements))
+	}
+
+	whileLoop, ok := program.Statements[0].(*ast.WhileLoopStatement)
+
+	if !ok {
+		t.Fatalf("Statement is not ast.WhileLoopStatement, got=%T",
+			program.Statements[0])
+	}
+
+	testInfixExpression(t, whileLoop.Condition, "x", ">", 5)
+
+	if len(whileLoop.Body.Statements) != 0 {
+		t.Fatalf("whileLoop.Body.Statements doesn't have 0 statements, got=%d\n",
+			len(whileLoop.Body.Statements))
+	}
+
+}
 func TestFunctionLiteralWithName(t *testing.T) {
   input := `let myFunction = fn() { };`
 

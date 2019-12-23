@@ -1,7 +1,10 @@
 fibonacci
 
-.gitignore
 monkey
 MonkeyInterpreter
 
 *.go-e
+
+# Text Editors
+.vscode/
+.idea/
