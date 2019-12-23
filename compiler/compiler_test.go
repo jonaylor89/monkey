@@ -2,11 +2,11 @@ package compiler
 
 import (
 	"fmt"
-	"github.com/jonaylor89/MonkeyInterpreter/ast"
-	"github.com/jonaylor89/MonkeyInterpreter/code"
-	"github.com/jonaylor89/MonkeyInterpreter/lexer"
-	"github.com/jonaylor89/MonkeyInterpreter/object"
-	"github.com/jonaylor89/MonkeyInterpreter/parser"
+	"github.com/jonaylor89/monkey/ast"
+	"github.com/jonaylor89/monkey/code"
+	"github.com/jonaylor89/monkey/lexer"
+	"github.com/jonaylor89/monkey/object"
+	"github.com/jonaylor89/monkey/parser"
 	"testing"
 )
 
@@ -281,8 +281,8 @@ func TestGlobalLetStatements(t *testing.T) {
 func TestStringExpression(t *testing.T) {
 	tests := []compilerTestCase{
 		{
-			input:             `"MonkeyInterpreter"`,
-			expectedConstants: []interface{}{"MonkeyInterpreter"},
+			input:             `"monkey"`,
+			expectedConstants: []interface{}{"monkey"},
 			expectedInstructions: []code.Instructions{
 				code.Make(code.OpConstant, 0),
 				code.Make(code.OpPop),
