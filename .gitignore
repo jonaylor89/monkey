@@ -8,3 +8,4 @@ MonkeyInterpreter
 # Text Editors
 .vscode/
 .idea/
+*.out
