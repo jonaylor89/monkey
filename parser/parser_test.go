@@ -1021,32 +1021,32 @@ func TestWhileLoopStatementParsing(t *testing.T) {
 
 }
 func TestFunctionLiteralWithName(t *testing.T) {
-  input := `let myFunction = fn() { };`
+	input := `let myFunction = fn() { };`
 
-  l := lexer.New(input)
-  p := New(l)
-  program := p.ParseProgram()
-  checkParseErrors(t, p)
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParseErrors(t, p)
 
-  if len(program.Statements) != 1 {
-    t.Fatalf("program.Body does not contain %d statements. got=%d\n",
-              1, len(program.Statements)) 
-  }
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Body does not contain %d statements. got=%d\n",
+			1, len(program.Statements))
+	}
 
-  stmt, ok := program.Statements[0].(*ast.LetStatement)
-  if !ok {
-    t.Fatalf("program.Statements[0] is not ast.LetStatements. got=%T\n",
-              program.Statements[0]) 
-  }
+	stmt, ok := program.Statements[0].(*ast.LetStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not ast.LetStatements. got=%T\n",
+			program.Statements[0])
+	}
 
-  function, ok := stmt.Value.(*ast.FunctionLiteral)
-  if !ok {
-    t.Fatalf("stmt.Value is not ast.FunctionLiteral. got=%T\n",
-              stmt.Value) 
-  }
+	function, ok := stmt.Value.(*ast.FunctionLiteral)
+	if !ok {
+		t.Fatalf("stmt.Value is not ast.FunctionLiteral. got=%T\n",
+			stmt.Value)
+	}
 
-  if function.Name != "myFunction" {
-    t.Fatalf("function literal name wrong. want 'myFunction', got=%q\n",
-              function.Name) 
-  }
+	if function.Name != "myFunction" {
+		t.Fatalf("function literal name wrong. want 'myFunction', got=%q\n",
+			function.Name)
+	}
 }

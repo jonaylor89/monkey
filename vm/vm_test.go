@@ -432,9 +432,9 @@ func TestRecursiveFibonacci(t *testing.T) {
 }
 
 func TestRecursiveFunctions(t *testing.T) {
-  tests := []vmTestCase{
-    {
-      input: `
+	tests := []vmTestCase{
+		{
+			input: `
         let countDown = fn(x) {
           if (x == 0) {
             return 0; 
@@ -444,12 +444,12 @@ func TestRecursiveFunctions(t *testing.T) {
         };
 
         countDown(1);
-      ` ,
-      expected: 0,
-    },
-  }
+      `,
+			expected: 0,
+		},
+	}
 
-  runVmTests(t, tests)
+	runVmTests(t, tests)
 }
 
 func runVmTests(t *testing.T, tests []vmTestCase) {

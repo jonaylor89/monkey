@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"os/user"
+
 	"github.com/jonaylor89/monkey/compiler"
 	"github.com/jonaylor89/monkey/evaluator"
 	"github.com/jonaylor89/monkey/lexer"
@@ -10,9 +14,6 @@ import (
 	"github.com/jonaylor89/monkey/parser"
 	"github.com/jonaylor89/monkey/repl"
 	"github.com/jonaylor89/monkey/vm"
-	"io/ioutil"
-	"os"
-	"os/user"
 )
 
 var engine = flag.String("engine", "vm", "use 'vm' or 'eval'")
